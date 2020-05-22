@@ -1,0 +1,9 @@
+{
+	"prefix": "!",
+	"token": "<your token here>",
+	"pronounFile": "pronouns.json",
+	"welcomeText": "welcome.txt",
+	"modID" : "<modID here>",
+	"adminID" : "<adminID here>",
+	"botmaker" : "<userID here>"
+}
