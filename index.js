@@ -2,11 +2,12 @@
 // alerts when streamer goes online
 // dm pronoun instructions - done!
 // take over pronoun role assignment
+//    read pronoun roles when turned on?
+//    check & remind pronoun roles
 // smooth goof - done!
 //    implement role saving & message ignoral
 // affirm + random affirmations
 // music
-// check & remind pronoun roles
 
 const Discord = require('discord.js');
 
@@ -14,9 +15,18 @@ const fs = require('fs')
 
 const config = require('./config.json');
 const prefix = config.prefix;
-const pronouns = JSON.parse(fs.readFileSync(`./${config.pronounFile}`,'utf8'));
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	// set a new item in the Collection
+	// with the key as the command name and the value as the exported module
+	client.commands.set(command.name, command);
+}
 
 
 client.on('ready', () => {
@@ -24,63 +34,44 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-	// console.log(message.content);
-	if (!message.content.startsWith(prefix) || message.author.bot) return;
+  // console.log(message.content);
+  if (message.author.bot) return;
+
+  else if (message.channel.type !== 'text') {
+    message.reply('I don\'t work in DMs (yet!!)')
+    .then(message.reply('(but I love you very much)'));
+  }
+
+  const pronouns = JSON.parse(fs.readFileSync(`./${config.pronounFile}`,'utf8'));
+
+  else if (!message.member.roles.cache.some(role => role.name in pronouns)
+   && (message.content.slice(0,8) !== `${prefix}pronoun`)) {
+      message.member.send("Hi! I noticed you haven't assigned yourself a pronoun role yet. It would mean a lot if you did!")
+      .then(message.member.send("If assigning yourself pronouns makes you uncomfortable, that\'s okay! We have "+
+      "any/all and no/thx available as well. If these don't suit you either, please message a mod!"))
+      .then(message.member.send("(also yes you will get this every time you send a message, it's not to be annoying, it's just the person who coded me is lazy)"));
+
+  }
+
+	else if (!message.content.startsWith(prefix)) return;
 
   else {
     const args = message.content.slice(prefix.length).split(' ');
     const command = args.shift().toLowerCase();
 
-    if (command === 'smooth') {
-      // smooth the chat
-      // first, check if smoother is ME
-      if (message.member.id === config.botmaker) {
-        message.reply('Creator! They who gave me Life! I would never!')
-      }
-      // then check if they're a mod
-      else if (message.member.roles.cache.some(role => role.id === config.modID)) {
-        // if they mention anyone, smooth them (tbi)
-        // but they can't kick themself or other mods!!
-        message.reply('I can\'t let you do that');
-      }
-      // finally smooth the sender
-      else {
-        console.log(`Member ${message.member.displayName} smoothed themself`);
-        message.channel.createInvite()
-          .then(invite => message.member.send("Congratulations, you smoothed yourself. Rejoin here: https://discord.gg/"+invite.code))
-          .then(setTimeout( function(){ message.member.kick("s m o o t h   t h e   c h a t");},1000));
-      }
+    if (command === 'test') {
+      message.reply("nothing\'s being tested right now, but thanks for trying!");
+      console.log(`Member ${message.member.displayName} wants to help test!`);
+      return;
     }
 
-    else if (command === 'affirm') {
-      if (message.mentions.members.array().length > 0){
-        message.mentions.members
-          .each(member => member.send("You\'re great and I love you!"))
-          .each(member => console.log(`Member ${member.displayName} affirmed!`));
-      }
-      else {
-        message.member.send("You\'re great and I love you!");
-        console.log(`Member ${message.member.displayName} affirmed!`);
-      }
-    }
+    else if (!client.commands.has(command)) return;
 
-    else if (command === 'test') {
-      //message.reply("nothing\'s being tested right now, but thanks for trying!");
-      //console.log(`Member ${message.member.displayName} wants to help test!`);
-      //return;
-      if (message.member.roles || !message.member.roles.cache.some(role => role.name in pronouns)) {
-        if (message.content.slice(0,8) != `${prefix}pronoun`) {
-          message.member.send("Hi! I noticed you haven't assigned yourself a pronoun role yet. It would mean a lot if you did!")
-          .then(message.member.send("If assigning yourself pronouns makes you uncomfortable, that\'s okay! We have "+
-          "any/all and no/thx available as well. If these don't suit you either, please message a mod!"));
-        }
-      }
-    }
-
-    else {
-      //message.reply(`there\'s no command called ${command}, try !help (if it\'s been implemented lol)`);
-      console.log(`Member ${message.member.displayName} tried to ${command}. Obviously, it failed.`)
-
+    try {
+    	client.commands.get(command).execute(message, args);
+    } catch (error) {
+    	console.error(error);
+    	message.reply('there was an error trying to execute that command!');
     }
   }
 });
@@ -99,4 +90,4 @@ client.on('guildMemberAdd', member => {
   console.log(`Welcome message sent to ${member.displayName}`)
 });
 
-client.login(token);
+client.login(config.token);
