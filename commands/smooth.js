@@ -14,9 +14,12 @@ module.exports = {
     }
     // finally smooth the sender
     else {
+      var smoothed = JSON.parse(fs.readFileSync(`./smoothers.json`,'utf8'));
       console.log(`Member ${message.member.displayName} smoothed themself`);
       message.channel.createInvite()
-        .then(invite => message.member.send("Congratulations, you smoothed yourself. Rejoin here: https://discord.gg/"+invite.code))
+        .then(invite => message.member.send("Congratulations, you smoothed yourself."
+        +" Rejoin here: https://discord.gg/"+invite.code))
+        .then(smoothed.message.member.id = message.member.roles.cache.)
         .then(setTimeout( function(){ message.member.kick("s m o o t h   t h e   c h a t");},1000));
     }
 	},
