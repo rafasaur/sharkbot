@@ -9,7 +9,9 @@ module.exports = {
 			if (arg in pronouns) {
 				try {
 					const role = message.member.roles.cache.find(role => role.name === arg);
-					message.member.roles.remove(role);
+					message.member.roles.remove(role)
+					.then(message.reply('removed those for you ❤️'));
+					console.log(`Removed pronouns ${role.name} for member ${message.member.displayName}`);
 				}
 				catch(err) {
 					console.error(err);

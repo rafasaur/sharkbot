@@ -48,6 +48,12 @@ client.on('message', message => {
 
 	if (message.author.id === config.strimmerman) message.react('❤️');
 
+	if (message.content.toLowerCase().includes('sharkbot') ||
+		message.content.toLowerCase().includes('shark bot')) message.react(`705619021130891284`);
+
+	if (message.content.toLowerCase().includes('spaghetti') ||
+		message.content.toLowerCase().includes('spaghs')) message.react(`705618446259322881`);
+
   if (message.author.bot) return;
 
   else if (message.channel.type !== 'text') {
@@ -59,8 +65,9 @@ client.on('message', message => {
     .then(client.users.cache.get(config.botmaker).send(`>>> `+message.content));
   }
 
-  else if (!message.member.roles.cache.some(role => role.name in pronouns)
-   && (message.content.slice(0,11) !== `${prefix}setpronoun`)) {
+  else if (!message.member.roles.cache.some(role => role.name in pronouns) &&
+		(message.content.slice(0,11) !== `${prefix}setpronoun`) &&
+		(!client.commands.get('setpronoun').aliases.includes(message.content.slice(prefix.length).split(' ')[0]))) {
       message.member.send("Hi! I noticed you haven't assigned yourself a pronoun role yet."+
       " It would mean a lot if you did!")
       .then(message.member.send("If assigning yourself pronouns makes you uncomfortable,"+
@@ -106,15 +113,20 @@ client.on('guildMemberAdd', member => {
   }
   else {
     const pronouns = JSON.parse(fs.readFileSync(`./${config.pronounFile}`,'utf8'));
-    let welcomeMsg = fs.readFileSync(`./${config.welcomeText}`,'utf8');
-    welcomeMsg = welcomeMsg.split('<>');
-    let pronounList = "";
-    for (pn in pronouns) pronounList += "   " + pn + '\n';
-    //console.log(pronouns);
-    welcomeMsg.splice(3,0,pronounList);
-    //console.log(welcomeMsg)
-    member.send(welcomeMsg.flat());
-    console.log(`Welcome message sent to ${member.displayName}`)
+		let pronounList = `>>> `;
+    for (pn in pronouns) pronounList += pn + '\n';
+    member.send("Hi! Welcome to the Tank!")
+		.then(member.send("In order to Be Excellent to Each Other we request that you "+
+			"assign yourself the pronouns you use! You can do this by sending "+
+			"\`%pronoun <your pronoun here>\` (e.g.: \`%pronoun she/they\`) "+
+			"in any of the channels (but preferably \`#bot-talk\`)."))
+		.then(member.send("If the pronouns you use have not yet been added, "+
+			"please message one of the mods and they will add it for you!"))
+		.then(member.send("Currently, the following pronouns are available:"))
+    .then(member.send(pronounList))
+		.then(member.send("Once again, welcome! We're so glad you're here. "+
+			"Tanks for the memories!"));
+    console.log(`Welcome message sent to ${member.displayName}`);
   }
 });
 
