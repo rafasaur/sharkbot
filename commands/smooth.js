@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'smooth',
 	description: 'smooth the chat',
-	execute(message, args, config) {
+	execute(message, args, config, fs) {
     // check if you made this
     if (message.member.id === config.botmaker) {
       message.reply('Creator! They who gave me Life! I would never!')
@@ -19,7 +19,7 @@ module.exports = {
       message.channel.createInvite()
         .then(invite => message.member.send("Congratulations, you smoothed yourself."
         +" Rejoin here: https://discord.gg/"+invite.code))
-        .then(smoothed.message.member.id = message.member.roles.cache.)
+        //.then(smoothed.message.member.id = message.member.roles.cache)
         .then(setTimeout( function(){ message.member.kick("s m o o t h   t h e   c h a t");},1000));
     }
 	},

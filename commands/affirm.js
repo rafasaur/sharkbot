@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'affirm',
 	description: 'affirm your friends!',
-	execute(message, args, config) {
+	execute(message, args, config, fs) {
     if (message.mentions.members.array().length > 0){
       message.mentions.members
         .each(member => member.send("You\'re great and I love you!"))
@@ -10,7 +10,7 @@ module.exports = {
     else {
       message.member.send("You\'re great and I love you!");
       console.log(`Member ${message.member.displayName} affirmed!`);
-    message.react('❤️')
     }
+    message.react('❤️')
   },
 };

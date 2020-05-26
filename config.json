@@ -1,9 +1,10 @@
 {
-	"prefix": "!",
+	"prefix": "%",
 	"token": "NzExMDExMTY2NDM1OTM0MjI5.Xr8y_Q.dOvgnyw6UclPqbWiyyLBJgJPsrE",
 	"pronounFile": "pronouns.json",
 	"welcomeText": "welcome.txt",
 	"modID" : "705507485682761858",
 	"adminID" : "0",
-	"botmaker" : "197687298198863872"
+	"botmaker" : "197687298198863872",
+	"strimmerman" : "550731489566916611"
 }
