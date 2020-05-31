@@ -1,8 +1,13 @@
+// addpronoun.js
+
+const fs = require('fs');
+const config = require('./../config.json');
+
 module.exports = {
 	name: 'addpronoun',
 	aliases:['addpronouns'],
 	description: 'adds a set of pronouns to the list',
-	execute(message, args, config, fs) {
+	execute(message, args) {
 		if (message.member.roles.cache.some(role => role.id === config.modID) ||
 		message.member.id === config.botmaker) {
 	    var pronouns = JSON.parse(fs.readFileSync(`./${config.pronounFile}`,'utf8'));

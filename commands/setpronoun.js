@@ -1,11 +1,16 @@
+// setpronoun.js
+
+const fs = require('fs');
+const config = require('./../config.json');
+
 module.exports = {
 	name: 'setpronoun',
 	aliases: ['pronoun','pronouns','setpronouns'],
 	description: 'add a pronoun role to user',
-	execute(message, args, config, fs) {
+	execute(message, args) {
     //check if valid pronoun, add role
     const pronouns = JSON.parse(fs.readFileSync(`./${config.pronounFile}`,'utf8'));
-    for (let arg of args) {
+    for (const arg of args) {
       if (arg in pronouns) {
 				//console.log(arg);
         const role = message.guild.roles.cache.find(role => role.name === arg);

@@ -1,10 +1,64 @@
 {
 	"prefix": "%",
+
 	"token": "NzExMDExMTY2NDM1OTM0MjI5.Xr8y_Q.dOvgnyw6UclPqbWiyyLBJgJPsrE",
+
+	"importantIDs" : {
+		"modID" : "705507485682761858",
+		"adminID" : "0",
+		"botmaker" : "197687298198863872",
+		"strimmerman" : "550731489566916611"
+	},
+
+	"custoMoji" : {},
+
 	"pronounFile": "pronouns.json",
 	"welcomeText": "welcome.txt",
-	"modID" : "705507485682761858",
-	"adminID" : "0",
-	"botmaker" : "197687298198863872",
-	"strimmerman" : "550731489566916611"
+
+
+	"commands" : {
+
+		"addpronoun" : {
+			"enabled" : true,
+			"restricted" : false
+		},
+
+		"affirm" : {
+			"enabled" : true,
+			"restricted" : false
+		},
+
+		"removepronoun" : {
+			"enabled" : true,
+			"restricted" : false
+		},
+
+		"setpronoun" : {
+			"enabled" : true,
+			"restricted" : false
+		},
+
+		"smooth" : {
+			"enabled" : true,
+			"restricted" : false
+		}
+
+	},
+
+
+	"features" : {
+
+		"spaghetti" : true,
+		"sharkbot" : true,
+
+		"twitch" : {
+			"client-ID" : "",
+			"client-secret" : "",
+			"username" : "",
+			"announcementChannelID" : "",
+
+			"enabled" : true,
+			"restricted" : false
+		}
+	}
 }
