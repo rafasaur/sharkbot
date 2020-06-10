@@ -1,7 +1,7 @@
 module.exports = {
 	name: '<name>',
 	description: '<desc>',
-	execute(message, args, config) {
+	execute(message, args) {
 
   },
 };

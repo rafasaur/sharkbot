@@ -3,7 +3,7 @@
 const https = require('https');
 const { MessageEmbed } = require('discord.js');
 
-const config = require('./../config.json');
+const config = require('./../resources/config.json');
 
 
 let accessToken;

@@ -1,34 +1,48 @@
 // smooth.js
 
 const fs = require('fs');
-const config = require('./../config.json');
+const config = require('./../resources/config.json');
 
 module.exports = {
 	name: 'smooth',
 	description: 'smooth the chat',
 	execute(message, args) {
-    // check if you made this
-    if (message.member.id === config.importantIDs.botmaker) {
-      message.reply('Creator! They who gave me Life! I would never!')
-    }
-    // then check if they're a mod
-    else if (message.member.roles.cache.some(role => role.id === config.importantIDs.modID)) {
-      // if they mention anyone, smooth them (tbi)
-      // but they can't kick themself or other mods!!
-      message.reply('I can\'t let you do that');
-    }
-    // finally smooth the sender
-    else {
-      let smoothed = JSON.parse(fs.readFileSync(`./../smoothers.json`,'utf8'));
-      console.log(`Member ${message.member.displayName} smoothed themself`);
-      message.channel.createInvite()
-        .then(invite => message.member.send("Congratulations, you smoothed yourself."
-        +" Rejoin here: https://discord.gg/"+invite.code))
-				.then(smoothed[message.member.id] = [])
-        .then(for(role of message.member.roles.cache) {
-					smoothed[message.member.id].push(role.id)
-				})
-        .then(setTimeout( function(){ message.member.kick("s m o o t h   t h e   c h a t");},1000));
-    }
+		console.log(`smoothing...`);
+
+		// for a solitary smooth
+		if (message.mentions.members.array().length === 0){
+
+			// owner can't smooth themself!
+	    if (message.member.id === config.ownerID) {
+				console.log(`creator?! never!`);
+	      message.reply('Creator! They who gave me Life! I would never!');
+	    }
+
+			// check if the smoother is a mod (tbi)
+			else if (message.member.roles.cache.some(role => config.importantIDs.includes(role.name))) {
+				message.reply('I can\'t let you do that!');
+			}
+
+			// all set, smooth ahead!
+			else smoothMember(message.channel,message.member);
+		}
+
+		// smoothing others (tbi) (should be limited to mods)
+		else message.channel.send("I can't smooth others, but maybe someday! :)")
 	},
 };
+
+function smoothMember (channel,member) {
+	let smoothed = JSON.parse(fs.readFileSync(`./resources/moothers.json`,'utf8'));
+	channel.createInvite()
+		.then(invite => member.send("Congratulations, you've been smoothed. "+
+			"Rejoin here: https://discord.gg/"+invite.code))
+		.then(smoothed[member.user.username] = [])
+		.then(member.roles.cache.each(role => smoothed[member.user.username].push(role.id)));
+
+	setTimeout( function(){
+		fs.writeFileSync(`./resources/moothers.json`,JSON.stringify(smoothed,null,'\t'));
+		member.kick("s m o o t h   t h e   c h a t");
+		console.log(`${member.displayName} has been smoothed!`);
+	},1000);
+}
