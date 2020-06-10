@@ -19,7 +19,7 @@ module.exports = {
 	    }
 
 			// check if the smoother is a mod (tbi)
-			else if (message.member.roles.cache.some(role => config.importantIDs.includes(role.name))) {
+			else if (message.member.roles.cache.some(role => role.name in config.importantRoles)) {
 				message.reply('I can\'t let you do that!');
 			}
 
@@ -33,7 +33,7 @@ module.exports = {
 };
 
 function smoothMember (channel,member) {
-	let smoothed = JSON.parse(fs.readFileSync(`./resources/moothers.json`,'utf8'));
+	let smoothed = JSON.parse(fs.readFileSync(`./resources/smoothers.json`,'utf8'));
 	channel.createInvite()
 		.then(invite => member.send("Congratulations, you've been smoothed. "+
 			"Rejoin here: https://discord.gg/"+invite.code))
@@ -41,7 +41,7 @@ function smoothMember (channel,member) {
 		.then(member.roles.cache.each(role => smoothed[member.user.username].push(role.id)));
 
 	setTimeout( function(){
-		fs.writeFileSync(`./resources/moothers.json`,JSON.stringify(smoothed,null,'\t'));
+		fs.writeFileSync(`./resources/smoothers.json`,JSON.stringify(smoothed,null,'\t'));
 		member.kick("s m o o t h   t h e   c h a t");
 		console.log(`${member.displayName} has been smoothed!`);
 	},1000);

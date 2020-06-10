@@ -108,7 +108,7 @@ client.on('message', message => {
 // send welcome message
 client.on('guildMemberAdd', member => {
 
-	if (config.features.welcome.enabled) features.get(`welcome`).sendMessage(member);
+	if (config.features.welcome.enabled) client.features.get(`welcome`).sendMessage(member);
 
 });
 

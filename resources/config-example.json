@@ -1,9 +1,71 @@
 {
 	"prefix": "!",
-	"token": "<your token here>",
-	"pronounFile": "pronouns.json",
-	"welcomeText": "welcome.txt",
-	"modID" : "<modID here>",
-	"adminID" : "<adminID here>",
-	"botmaker" : "<userID here>"
+	"token": "<bot token>",
+
+	"importantRoles": {
+		"strimmerman": "<role name>",
+		"mods": "<mod role name>"
+	},
+	"ownerID": "<your id, probably>",
+
+	"commands": {
+
+		"affirm": {
+			"enabled": true,
+			"restricted": false,
+			"secret": false
+		},
+		"pronouns": {
+			"enabled": true,
+			"restricted": true,
+			"secret": false
+		},
+		"setprefix": {
+			"enabled": true,
+			"restricted": true,
+			"secret": false
+		},
+		"reload": {
+			"enabled": true,
+			"restricted": true,
+			"secret": true
+		},
+		"smooth": {
+			"enabled": true,
+			"restricted": false,
+			"secret": false,
+			"ignoreID": "<@everyone ID>"
+		},
+		"test": {
+			"enabled": true,
+			"restricted": true,
+			"secret": false
+		}
+	},
+	"features": {
+		"alarms": {
+			"enabled": false,
+			"channel": "<channel name>"
+		},
+		"reacts": {
+			"enabled": true,
+			"all": true,
+			"acab": false,
+			"spaghetti": true,
+			"sharkbot": true,
+			"strimmereact": false
+		},
+		"twitch": {
+			"client-ID": "",
+			"client-secret": "",
+			"username": "",
+			"announcementChannelID": "<channel ID>",
+			"enabled": true,
+			"restricted": false
+		},
+		"welcome": {
+			"enabled": true,
+			"text": ""
+		}
+	}
 }
