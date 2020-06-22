@@ -1,3 +1,5 @@
+const config = require('./../resources/config.json');
+
 module.exports = {
 	name: '<name>',
 	description: '<desc>',

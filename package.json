@@ -1,0 +1,21 @@
+{
+  "name": "sharkbot",
+  "version": "v1.0",
+  "description": "your friendly neighborhood sharkbot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafasaur/sharkbot.git"
+  },
+  "author": "rafasaur",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "moment-timezone": "^0.5.31",
+    "node-schedule": "^1.3.2",
+    "quick.db": "^7.1.1"
+  }
+}

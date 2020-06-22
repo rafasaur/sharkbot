@@ -13,6 +13,7 @@ let sentAnnouncementMessage;
 
 
 module.exports = {
+	name: "twitch",
 	description: 'Interacts with the Twitch API to do various tasks, such as livestream announcements',
 	fetchStream
 };

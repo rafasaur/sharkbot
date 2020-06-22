@@ -5,19 +5,26 @@ const Discord = require('discord.js');
 const fs = require('fs');
 var schedule = require('node-schedule');
 
-const config = require('./resources/config.json');
-let prefix = config.prefix;
+const helpers = require(`./resources/helpers.js`);
+
+let config = helpers.config; //require('./resources/config.json');
+let prefix, token;
+
+if (config.testMode) {
+	prefix = config.testPrefix;
+	token = config.testToken;
+}
+else {
+	prefix = config.prefix;
+	token = config.token;
+}
 
 const emoji = require(`./resources/emoji.js`);
-
-const helpers = require(`./resources/helpers.js`);
 
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.features = new Discord.Collection();
-
-client.alarms = new Discord.Collection();
 
 
 // set up collections (anything mutable or client-side callable)
@@ -29,27 +36,34 @@ helpers.loadCommands(client,commandFiles);
 const featureFiles = fs.readdirSync('./features').filter(file => file.endsWith('.js'));
 helpers.loadFeatures(client,featureFiles);
 
-// ## pronouns
-//const pronouns = JSON.parse(fs.readFileSync(`./resources/pronouns.json`,'utf8'));
-//if (config.pronouns.enabled) helpers.loadPronouns(client,pronouns);
-
 
 // load the bot
 client.on('ready', async () => {
 	console.log('Loading...');
 	// set status of bot
 	//await client.user.setStatus('available');
-	await client.user.setActivity('of electric meats', {type: 'DREAMING'});
+	await client.user.setStatus('dreaming of a smooth world...');
+
+	// should establish alarms here?
 
 	// periodically check twitch
 	//setInterval(() => twitch.fetchStream(client), 60000);
 
-	console.log('SharkBot is ready to swim!');
+	// ## alarms
+	if (config.commands.alarms.enabled) {
+		const alarmFile = fs.readFileSync(`./resources/alarms.txt`,'utf8');
+		helpers.loadAlarms(client,alarmFile);
+	}
+
+	if (config.testMode) console.log('smooth bot is ready for testing!');
+	else console.log('SharkBot is ready to swim!');
 });
 
 
 // dynamic command handler
 client.on('message', message => {
+
+	console.log(`in ${message.channel.name}, from ${message.author.username}: ${message.content}`);
 
 	// react with specific emotes if mentioned
 	if (message.channel.type === 'text' && config.features.reacts.enabled) {
@@ -65,42 +79,45 @@ client.on('message', message => {
     const atme = client.users.cache.get(config.ownerID);
     message.reply('I don\'t work in DMs (yet!!), but I love you very much!\n'+
     `*((if this is an urgent matter please DM ${atme}))*`);
-    client.users.cache.get(config.botmaker).send(`*DM from ${message.author.username}:*`)
-    .then(client.users.cache.get(config.botmaker).send(`>>> `+message.content));
+    client.users.cache.get(config.ownerID).send(`*DM from ${message.author.username}:*`)
+    .then(client.users.cache.get(config.ownerID).send(`>>> `+message.content));
   }
 
-
-	// if someone has not been assigned pronouns, send them a message
-  if (config.commands.pronouns.enabled) client.commands.get('pronouns').checkAndPester(message);
-
-
-	// check for commands
-	if (!message.content.startsWith(prefix)) return;
+	else {
+		// if someone has not been assigned pronouns, send them a message
+	  if (config.commands.pronouns.enabled &&
+			!message.system && !config.testMode) client.commands.get('pronouns').checkAndPester(message);
 
 
-	// dynamically handle commands
-  else {
-    const args = message.content.slice(prefix.length).split(' ');
-    const commandName = args.shift().toLowerCase();
+		// check for commands
+		if (!message.content.startsWith(prefix)) return;
+		// this regex will find any command in the text: /\prefix+\w*/g
 
-		// actually handle executing commands via files
-    const command = client.commands.get(commandName)
-			|| client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-		console.log(commandName,command);
+		// dynamically handle commands
+	  else {
+	    const args = message.content.slice(prefix.length).split(' ');
+	    const commandName = args.shift().toLowerCase();
 
-		if (!command) return;
+			// actually handle executing commands via files
+	    const command = client.commands.get(commandName)
+				|| client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-    try {
-    	command.execute(message, args);
-			if (command.name === 'setprefix') {
-				prefix = JSON.parse(fs.readFileSync(`./resources/config.json`,'utf8')).prefix;
-			}
-    } catch (error) {
-    	console.error(error);
-    	message.reply('there was an error trying to execute that command!');
-    }
-  }
+			console.log(commandName,command);
+
+			if (!command) return;
+
+	    try {
+	    	command.execute(message, args);
+				if (command.name === 'setprefix') {
+					prefix = JSON.parse(fs.readFileSync(`./resources/config.json`,'utf8')).prefix;
+				}
+	    } catch (error) {
+	    	console.error(error);
+	    	message.reply('there was an error trying to execute that command!');
+	    }
+	  }
+	}
 });
 
 
@@ -108,8 +125,10 @@ client.on('message', message => {
 // send welcome message
 client.on('guildMemberAdd', member => {
 
-	if (config.features.welcome.enabled) client.features.get(`welcome`).sendMessage(member);
+	if (config.features.welcome.enabled && !config.testMode) {
+		client.features.get(`welcome`).sendMessage(member);
+	}
 
 });
 
-client.login(config.testToken);
+client.login(token);

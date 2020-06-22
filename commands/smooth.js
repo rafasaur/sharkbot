@@ -2,19 +2,25 @@
 
 const fs = require('fs');
 const config = require('./../resources/config.json');
+const emoji = require('./../resources/emoji.js')
 
 module.exports = {
 	name: 'smooth',
 	description: 'smooth the chat',
+
+	help(message,args) {
+		message.channel.send(`Just do it, friend. Smooth thyself. ${config.prefix}smooth`);
+	},
+
 	execute(message, args) {
-		console.log(`smoothing...`);
+		console.log(`\nsmoothing...`);
 
 		// for a solitary smooth
 		if (message.mentions.members.array().length === 0){
 
 			// owner can't smooth themself!
 	    if (message.member.id === config.ownerID) {
-				console.log(`creator?! never!`);
+				console.log(`creator?! never!\n`);
 	      message.reply('Creator! They who gave me Life! I would never!');
 	    }
 
@@ -24,7 +30,10 @@ module.exports = {
 			}
 
 			// all set, smooth ahead!
-			else smoothMember(message.channel,message.member);
+			else {
+				smoothMember(message.channel,message.member);
+				message.react(emoji.smooth);
+			}
 		}
 
 		// smoothing others (tbi) (should be limited to mods)
@@ -34,11 +43,14 @@ module.exports = {
 
 function smoothMember (channel,member) {
 	let smoothed = JSON.parse(fs.readFileSync(`./resources/smoothers.json`,'utf8'));
+	smoothed[member.user.id] = {};
+	smoothed[member.user.id]["roles"] = [];
+	smoothed[member.user.id]["nickname"] = member.nickname;
+	member.roles.cache.each(role => smoothed[member.user.id]['roles'].push(role.id));
+
 	channel.createInvite()
 		.then(invite => member.send("Congratulations, you've been smoothed. "+
-			"Rejoin here: https://discord.gg/"+invite.code))
-		.then(smoothed[member.user.username] = [])
-		.then(member.roles.cache.each(role => smoothed[member.user.username].push(role.id)));
+			"Rejoin here: https://discord.gg/"+invite.code));
 
 	setTimeout( function(){
 		fs.writeFileSync(`./resources/smoothers.json`,JSON.stringify(smoothed,null,'\t'));

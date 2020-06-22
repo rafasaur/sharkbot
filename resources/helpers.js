@@ -1,9 +1,17 @@
 // helpers.js
 
 const fs = require('fs');
-const config = require('./config.json');
+let config = JSON.parse(fs.readFileSync('./resources/config.json','utf8'))
 
 module.exports = {
+
+  config : config,
+
+  updateConfig (key,val) {
+    this.config[key] = val;
+    fs.writeFile('./config.json',JSON.stringify(this.config));
+  },
+
   checkCallerID (member) {
 
   	if (member.roles.cache.some(role => role.name in config.importantRoles) ||
@@ -45,9 +53,6 @@ module.exports = {
     			// set features
     			const feature = require(`./../features/${file}`);
     			client.features.set(featureName, feature);
-    			if (featureName === "alarms") {
-    				client.commands.set("addalarm",alarms.addAlarm);
-    			}
     		}
     		else console.log(`feature ${featureName} not enabled`);
     	}
@@ -57,6 +62,8 @@ module.exports = {
 
 
   loadAlarms (client, alarmFile) {
-    return;
+    for (const alarm of alarmFile.match(/\{([^\;]+)\}/g)) {
+      client.commands.find(cmd => cmd.name === 'alarms').setAlarm(client, JSON.parse(alarm));
+    }
   }
 }

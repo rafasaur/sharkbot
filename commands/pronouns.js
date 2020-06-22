@@ -9,17 +9,26 @@ const aliases = ["pronoun","setpronoun","setpronouns"];
 const addAliases = ["addpronoun","addpronouns"];
 const delAliases = ["deletepronoun","deletepronouns","delpronoun","delpronouns"];
 const remAliases = ['removepronoun','removepronouns','rempronoun','rempronouns'];
+const listAliases = ['listpronouns','listpronoun','pronounlist'];
 
 let pronounList = fs.readFileSync(`./resources/pronouns.txt`,'utf8').replace(/\n|\r|\t/g,'').split(' ');
 // probably should check to make sure the listed pronouns are actually roles but :shrug:
 
-const allAliases = aliases.concat(addAliases,delAliases,remAliases,pronounList)
+const allAliases = aliases.concat(addAliases,delAliases,remAliases,listAliases,pronounList);
 
 
 module.exports = {
   name: "pronouns",
   aliases: allAliases,
   description: "for managing pronoun roles on the server",
+
+  help(message,args) {
+    const reply = `Expected use of pronoun is \`${config.prefix}pronoun your/pronouns\`. ` +
+      `Alternatively, you can just type \`${config.prefix}your/pronouns\`. ` +
+      "If the pronouns you use haven't been added yet, please @ or DM a mod! " +
+      `(to see a list of all added pronouns, use the command ${config.prefix}listpronouns).`;
+    message.channel.send(reply);
+  },
 
   execute (message,args) {
     // re-establish commandName
@@ -37,7 +46,17 @@ module.exports = {
       }
     }
     else if (command.includes("rem")) this.remove(message,args);
+    else if (command.includes("list")) this.listpronouns(message,args);
     else this.set(message,args);
+  },
+
+  listpronouns (message,args) {
+    let pronounListText = ">>> ";
+    for (const pn of pronounList) {
+      pronounListText += pn+'\n';
+    }
+    const reply = "The list of currently active pronouns is:\n" + pronounListText;
+    message.channel.send(reply);
   },
 
   add (message,args) {
@@ -68,7 +87,7 @@ module.exports = {
     }
 
     // after looping through pronouns, rewrite list to file for preservation
-    setTimeout(function() {
+    setTimeout( function() {
       console.log(`pronoun list writing to file: ${pronounList}`);
       fs.writeFileSync(`./resources/pronouns.txt`,pronounList.join(' '));
     },1000)
@@ -122,6 +141,7 @@ module.exports = {
     const role = message.guild.roles.cache.find(role => role.name === pronoun);
     message.member.roles.add(role)
     .then(message.react(emoji.thumbsup));
+
     console.log(`pronoun ${role.name} added for member ${message.member.displayName}`);
   },
 
@@ -133,7 +153,7 @@ module.exports = {
     // peel off first word in message
     const firstWord = message.content.slice(config.prefix.length).split(' ')[0];
 		// check if the user is trying to assign pronouns
-		if (firstWord !== this.name && !aliases.includes(firstWord) &&
+		if (firstWord !== this.name && !this.aliases.includes(firstWord) &&
 			!(firstWord in pronounList)) {
         // if not, pester away
 	      message.member.send("Hi! I noticed you haven't assigned yourself a pronoun role yet."+
@@ -143,6 +163,7 @@ module.exports = {
 	      " If these don't suit you either, please message a mod!\n"+
 	      "(also yes you will get this every time you send a message."+
 	      " It's not to be annoying, it's just the person who coded me is lazy)");
+
         console.log(`member ${message.member.displayName} pestered!`);
 		}
   }
