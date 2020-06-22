@@ -51,9 +51,7 @@
 			"enabled": true,
 			"all": true,
 			"acab": false,
-			"spaghetti": true,
-			"sharkbot": true,
-			"strimmereact": false
+			"etc" : "<your-memes-here>",
 		},
 		"twitch": {
 			"client-ID": "",
