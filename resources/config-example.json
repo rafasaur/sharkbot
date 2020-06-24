@@ -1,19 +1,31 @@
 {
+	"testMode" : false,
 	"prefix": "!",
-	"token": "<bot token>",
-
+	"token": "<bot-token>",
+	"testPrefix" : "$",
+	"testToken": "<test-token>",
 	"importantRoles": {
-		"strimmerman": "<role name>",
-		"mods": "<mod role name>"
+		"strimmerman": "<important-role-name>",
+		"mods": "<mod-role-name>"
 	},
-	"ownerID": "<your id, probably>",
-
+	"ownerID": "<your-id-probably>",
 	"commands": {
-
 		"affirm": {
 			"enabled": true,
 			"restricted": false,
 			"secret": false
+		},
+		"alarms":{
+			"enabled": true,
+			"restricted": false,
+			"meds-channel": "<default-posting-channel>",
+			"meds-role": "<@ role for attention>"
+		},
+		"helpme":{
+			"enabled": true
+		},
+		"polls" : {
+			"enabled" : true
 		},
 		"pronouns": {
 			"enabled": true,
@@ -23,7 +35,7 @@
 		"setprefix": {
 			"enabled": true,
 			"restricted": true,
-			"secret": false
+			"secret": true
 		},
 		"reload": {
 			"enabled": true,
@@ -34,30 +46,34 @@
 			"enabled": true,
 			"restricted": false,
 			"secret": false,
-			"ignoreID": "<@everyone ID>"
+			"ignoreID": "<@everyone id>"
 		},
 		"test": {
 			"enabled": true,
 			"restricted": true,
 			"secret": false
+		},
+		"timeout": {
+			"enabled": false,
+			"restricted": true,
+			"secret": true
 		}
 	},
 	"features": {
-		"alarms": {
-			"enabled": false,
-			"channel": "<channel name>"
-		},
 		"reacts": {
 			"enabled": true,
 			"all": true,
 			"acab": false,
-			"etc" : "<your-memes-here>",
+			"spaghetti": true,
+			"sharkbot": true,
+			"strimmereact": false,
+			"peachboy": true
 		},
 		"twitch": {
 			"client-ID": "",
 			"client-secret": "",
 			"username": "",
-			"announcementChannelID": "<channel ID>",
+			"announcementChannelID": "",
 			"enabled": true,
 			"restricted": false
 		},

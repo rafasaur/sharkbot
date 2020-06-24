@@ -53,9 +53,9 @@ module.exports = {
     }
 
     if (sendCheckIn) {
-      const atme = client.users.cache.get(config.ownerID);
+      const atme = message.client.users.cache.get(config.ownerID);
       message.member.send("Hey, are you doing okay? We're here for you. Post in " +
-        `#sharks-helping-sharks or main or wherever, or DM ${atme} if you'd like to talk!`);
+        `#sharks-helping-sharks or #main or wherever, or DM ${atme} if you'd like to talk!`);
     }
   }
 }
