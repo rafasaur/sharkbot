@@ -47,7 +47,7 @@ module.exports = {
 
     const selfHarmList = ['kill yourself', 'kill myself', 'kill your self',
       'kill my self', 'kys', 'kms', 'k y s'];
-    const sendCheckIn = false;
+    let sendCheckIn = false;
     for (const alert of selfHarmList) {
       if (msg.includes(alert)) sendCheckIn = true;
     }
