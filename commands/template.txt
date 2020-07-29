@@ -1,3 +1,5 @@
+// *.js
+
 const config = require('./../resources/config.json');
 
 module.exports = {
@@ -6,4 +8,8 @@ module.exports = {
 	execute(message, args) {
 
   },
+
+	help(message,args) {
+		message.channel.send(this.description);
+	},
 };

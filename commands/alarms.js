@@ -128,7 +128,7 @@ module.exports = {
 
     //if the alarm is specific to meds reminders (assuming the default)
     if (alarm.type === "meds") {
-      console.log(alarm.id);
+      //console.log(alarm.id);
       // pick out the role of remindees
       const atrole = channel.guild.roles.cache.find(role => role.id === config.commands.alarms["meds-role"]);
       message = `${atrole} ` + message;
@@ -138,7 +138,7 @@ module.exports = {
     let newSchedule = schedule.scheduleJob({hour: time.hour, minute: time.minute,
                         dayOfWeek: time.dayOfWeek}, function(){
       if (alarm.type === "meds" && reminderGroup[alarmID]) {
-        console.log(`picking random message...`)
+        //console.log(`picking random message...`)
         const thisMessages = reminderGroup[alarmID];
         const atrole = channel.guild.roles.cache.find(role => role.id === config.commands.alarms["meds-role"]);
         let randMsg = thisMessages[Math.floor(Math.random() * thisMessages.length)];
@@ -149,7 +149,7 @@ module.exports = {
 
     //client.alarms.set(alarm.name,newSchedule)
 
-    console.log(`New alarm set for channel ${channel.name}. Message reads: ${message}\n`);
+    //console.log(`New alarm set for channel ${channel.name}. Message reads: ${message}\n`);
   },
 
 };

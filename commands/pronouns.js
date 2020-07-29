@@ -19,38 +19,53 @@ const allAliases = aliases.concat(addAliases,delAliases,remAliases,listAliases,p
 
 module.exports = {
   name: "pronouns",
-  aliases: allAliases,
+  aliases: ['pronoun'].concat(pronounList),
   description: "for managing pronoun roles on the server",
 
   help(message,args) {
-    const reply = `Expected use of pronoun is \`${config.prefix}pronoun your/pronouns\`. ` +
+    const reply = `Expected use of pronoun is \`${config.prefix}pronoun set your/pronouns\`. ` +
       `Alternatively, you can just type \`${config.prefix}your/pronouns\`. ` +
       "If the pronouns you use haven't been added yet, please @ or DM a mod! " +
-      `(to see a list of all added pronouns, use the command ${config.prefix}listpronouns).`;
+      `(to see a list of all added pronouns, use the command \`${config.prefix}pronoun list\`).`;
     message.channel.send(reply);
   },
 
   execute (message,args) {
     // re-establish commandName
-    const command = message.content.slice(config.prefix.length).split(' ')[0].toLowerCase();
+    const command = helpers.getCommandName(message);
+    const arg0 = args.shift();
 
     // quick set pronouns
     if (pronounList.includes(command)) this.set(message,[command]);
 
-    // check for other command possibilities
-    else if (command.includes("add") || command.includes("del")) {
+    else if (arg0.includes('add') || arg0.includes('del')) {
       if (!config.commands.pronouns.restricted ||
         (config.commands.pronouns.restricted && helpers.checkCallerID(message.member))) {
-        if (command.includes('add')) this.add(message,args);
-        else this.delete(message,args)
-      }
+          if (arg0.includes('add')) this.add(message,args);
+          else this.delete(message,args);
+        }
     }
-    else if (command.includes("rem")) this.remove(message,args);
-    else if (command.includes("list")) this.listpronouns(message,args);
-    else this.set(message,args);
+
+    else if (arg0.includes("rem")) this.remove(message,args);
+    else if (arg0 === "list") this.list(message,args);
+
+    else if (arg0.includes("set") || arg0.includes("assign")) this.set(message,args);
+    else this.set(message,args.unshift(arg0));
+
+    // check for other command possibilities
+    //else if (command.includes("add") || command.includes("del")) {
+      //if (!config.commands.pronouns.restricted ||
+        //(config.commands.pronouns.restricted && helpers.checkCallerID(message.member))) {
+        //if (command.includes('add')) this.add(message,args);
+        //else this.delete(message,args)
+    //  }
+    //}
+    //else if (command.includes("rem")) this.remove(message,args);
+    //else if (command.includes("list")) this.listpronouns(message,args);
+    //else this.set(message,args);
   },
 
-  listpronouns (message,args) {
+  list (message,args) {
     let pronounListText = ">>> ";
     for (const pn of pronounList) {
       pronounListText += pn+'\n';
@@ -59,25 +74,24 @@ module.exports = {
     message.channel.send(reply);
   },
 
-  add (message,args) {
+  async add (message,args) {
     // add pronoun role to guild & updated list & aliases
-    for (var pronoun of args) {
+    for (let pronoun of args) {
       if (pronoun.includes('/') && !pronounList.includes(pronoun)) {
         // create role
-        message.guild.roles.create({
-          data: {
-            name: pronoun,
-            color: 'BLUE',
-          },
-          reason: `${pronoun} was missing, so added`,
-        })
+        const newRole = await message.guild.roles.create({
+                          data: {
+                            name: pronoun,
+                            color: 'BLUE',
+                          },
+                          reason: `${pronoun} was missing, so added`,
+                        })
         // add pronoun to global list & aliases
-        .then(role => {
-          pronounList.push(role.name);
-          this.aliases.push(role.name);
-        })
-        .then(message.channel.send(`Pronoun ${pronoun} added!`))
-        .then(console.log(`Pronoun ${pronoun} added to list!`));
+        await pronounList.push(role.name);
+        await this.aliases.push(role.name);
+
+        message.channel.send(`Pronoun ${pronoun} added!`);
+        console.log(`Pronoun ${pronoun} added to list!`);
       }
 
       else {
@@ -87,10 +101,8 @@ module.exports = {
     }
 
     // after looping through pronouns, rewrite list to file for preservation
-    setTimeout( function() {
-      console.log(`pronoun list writing to file: ${pronounList}`);
-      fs.writeFileSync(`./resources/pronouns.txt`,pronounList.join(' '));
-    },1000)
+    await fs.writeFileSync(`./resources/pronouns.txt`,pronounList.join(' '));
+    console.log(`pronoun list writing to file: ${pronounList}`);
   },
 
 
@@ -151,7 +163,7 @@ module.exports = {
     if (message.member.roles.cache.some(role => pronounList.includes(role.name))) return;
 
     // peel off first word in message
-    const firstWord = message.content.slice(config.prefix.length).split(' ')[0];
+    const firstWord = helpers.getCommandName(message);
 		// check if the user is trying to assign pronouns
 		if (firstWord !== this.name && !this.aliases.includes(firstWord) &&
 			!(firstWord in pronounList)) {

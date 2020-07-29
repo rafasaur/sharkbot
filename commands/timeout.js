@@ -10,8 +10,17 @@ module.exports = {
     if (!helpers.checkCallerID(message.member)) message.reply("you can't do that!");
 
     else {
-      const timedOuts = message.mentions.members;
+      message.mentions.members
+			.filter(mem => !helper.checkCallerID(mem))
+			.each(mem => helpers.timedOut.set(mem.id,time))
+			//wait given time
+			message.mentions.members
+			.each(mem => helpers.timedOut.delete(mem.id))
     }
 
   },
+
+	help (message,args) {
+		message.channel.send(this.description);
+	}
 };

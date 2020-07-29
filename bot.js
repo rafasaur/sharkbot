@@ -3,7 +3,7 @@
 const Discord = require('discord.js');
 
 const fs = require('fs');
-var schedule = require('node-schedule');
+let schedule = require('node-schedule');
 
 const helpers = require(`./resources/helpers.js`);
 
@@ -44,8 +44,6 @@ client.on('ready', async () => {
 	//await client.user.setStatus('available');
 	await client.user.setStatus('dreaming of a smooth world...');
 
-	// should establish alarms here?
-
 	// periodically check twitch
 	//setInterval(() => twitch.fetchStream(client), 60000);
 
@@ -63,12 +61,12 @@ client.on('ready', async () => {
 // dynamic command handler
 client.on('message', message => {
 
-	console.log(`in ${message.channel.name}, from ${message.author.username}: ${message.content}`);
+	if (config.log) console.log(`in ${message.channel.name}, ` +
+				`from ${message.author.username}: ${message.content}`);
 
 	// react with specific emotes if mentioned
 	if (message.channel.type === 'text' && config.features.reacts.enabled) {
-		const reactFeature = client.features.get('reacts');
-		reactFeature.react(message);
+		client.features.get('reacts').react(message);
 	}
 
 	// if the author is a bot, don't do anything
@@ -79,15 +77,27 @@ client.on('message', message => {
     const atme = client.users.cache.get(config.ownerID);
     message.reply('I don\'t work in DMs (yet!!), but I love you very much!\n'+
     `*((if this is an urgent matter please DM ${atme}))*`);
-    client.users.cache.get(config.ownerID).send(`*DM from ${message.author.username}:*`)
-    .then(client.users.cache.get(config.ownerID).send(`>>> `+message.content));
+    client.users.cache.get(config.ownerID).send(`*DM from ${message.author.username}:*\n`+
+	    																						`>>> `+message.content);
   }
 
 	else {
+		// if the author is on the watch list, DM the message
+		if (helpers.watchList.has(message.member.id)) {
+			client.users.cache.get(config.ownerID)
+			.send(`${message.author.username}, in ${message.channel.name}:`+
+		    																`>>> `+message.content);
+		}
+
 		// if someone has not been assigned pronouns, send them a message
-	  if (config.commands.pronouns.enabled &&
+	  if (config.commands.pronouns.enabled && config.commands.pronouns.pester &&
 			!message.system && !config.testMode) client.commands.get('pronouns').checkAndPester(message);
 
+
+		//if (helpers.timedOut.has(message.member.id)) {
+			//message.delete({reason:"timed out"});
+			//return;
+		//}
 
 		// check for commands
 		if (!message.content.startsWith(prefix)) return;
@@ -102,9 +112,7 @@ client.on('message', message => {
 			// actually handle executing commands via files
 	    const command = client.commands.get(commandName)
 				|| client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-
-			console.log(commandName,command);
-
+			//console.log(commandName,command);
 			if (!command) return;
 
 	    try {
@@ -121,14 +129,11 @@ client.on('message', message => {
 });
 
 
-
 // send welcome message
 client.on('guildMemberAdd', member => {
-
 	if (config.features.welcome.enabled && !config.testMode) {
 		client.features.get(`welcome`).sendMessage(member);
 	}
-
 });
 
 client.login(token);

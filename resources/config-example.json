@@ -18,8 +18,8 @@
 		"alarms":{
 			"enabled": true,
 			"restricted": false,
-			"meds-channel": "<default-posting-channel>",
-			"meds-role": "<@ role for attention>"
+			"default-channel": "<default-posting-channel>",
+			"default-role": "<role-id-(for-attention)>"
 		},
 		"helpme":{
 			"enabled": true
@@ -46,7 +46,7 @@
 			"enabled": true,
 			"restricted": false,
 			"secret": false,
-			"ignoreID": "<@everyone id>"
+			"ignoreID": "<@everyone-id>"
 		},
 		"test": {
 			"enabled": true,

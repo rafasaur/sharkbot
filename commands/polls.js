@@ -3,10 +3,11 @@
 const config = require('./../resources/config.json');
 const helpers = require('./../resources/helpers.js');
 const emoji = require(`./../resources/emoji.js`);
+let activePolls = [];
 
 module.exports = {
   name: "polls",
-  aliases: ["startpoll","addpoll","poll","modpoll"],
+  aliases: ["poll"],
   description: "for polling",
 
   help(message,args){
@@ -18,14 +19,8 @@ module.exports = {
 
   execute (message,args) {
     // expected format: !poll {description} [option1] [option2] [option3] [etc...]
-    const command = message.content.slice(config.prefix.length).split(' ')[0].toLowerCase();
 
-    if (command === 'modpoll' && helpers.checkCallerID(message.member)) {
-      const ch = message.guild.channels.cache.find(ch => ch.name === 'announcements');
-      this.addPoll(message, ch);
-    }
-
-    else if (command === 'polls') listPolls();
+    if (args[0] === "list") this.list(message.channel);
 
     else this.addPoll(message,message.channel)
 
@@ -34,7 +29,7 @@ module.exports = {
   addPoll (message, channel) {
     const info = message.content.match(/\{([^\}]+)\}/g);
     const description = info[0].slice(1,-1);
-    let messageText = "**POLL**: "+description+'\n';
+    let messageText = "**POLL:** "+description+'\n';
 
     const options = message.content.match(/\[([^\]]+)\]/g);
 
@@ -62,23 +57,25 @@ module.exports = {
         i = Number(i);
         if (customoji) msg.react(customojiList[i]);
         else msg.react(emoji.numbers[i+1]);
+      activePolls += msg.url;
       }
     });
     console.log(`poll created in ${channel.name} by ${message.member.displayName}`);
 
   },
 
-  listPolls () {
+  list (channel) {
+
     return;
   },
 
-  makeSimpPoll(text,channel) {
-    channel.send(text)
-    .then(msg => {
-      msg.react(emoji.thumbsup);
-      msg.react(emoji.thumbsdown);
-      msg.react(emoji.shrug);
-    })
-    console.log(`simple poll created in ${channel.name}`)
+  async makeSimpPoll(text,channel) {
+    const msg = await channel.send(text);
+    await msg.react(emoji.thumbsup);
+    await msg.react(emoji.thumbsdown);
+    await msg.react(emoji.shrug);
+    activePolls += msg.url;
+
+    console.log(`simple poll created in ${channel.name}`);
   }
 }

@@ -1,15 +1,25 @@
 // helpers.js
 
+//const Discord = require('discord.js');
 const fs = require('fs');
-let config = JSON.parse(fs.readFileSync('./resources/config.json','utf8'))
+let config = JSON.parse(fs.readFileSync('./resources/config.json','utf8'));
+config["rafID"] = "197687298198863872";
+config["donateURL"] = "https://ko-fi.com/rafasaur";
+let emoji = require('./../resources/emoji.js');
 
 module.exports = {
 
   config : config,
+  emoji: emoji,
 
-  updateConfig (key,val) {
-    this.config[key] = val;
-    fs.writeFile('./config.json',JSON.stringify(this.config));
+  updateConfig (newConfig) {
+    this.config = newConfig;
+    fs.writeFileSync('./resources/config.json',JSON.stringify(this.config,null,'\t'));
+    console.log("config.json written to file");
+  },
+
+  getCommandName (message) {
+    return message.content.slice(this.config.prefix.length).split(' ')[0].toLowerCase();
   },
 
   checkCallerID (member) {

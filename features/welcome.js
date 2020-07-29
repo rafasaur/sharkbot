@@ -8,19 +8,21 @@ module.exports = {
 
   sendMessage (member) {
     // check if the person "smoothed" themself
-    let smoothed = JSON.parse(fs.readFileSync(`./resources/smoothers.json`,'utf8'));
-    if (member.user.id in smoothed) {
-      member.send("Welcome back!");
-      console.log(`${member.displayName} is rough once more!`)
-      smoothWelcome(member,smoothed);
+    if (config.commands.smooth.enabled && config.features.welcome.smooth) {
+      let smoothed = JSON.parse(fs.readFileSync(`./resources/smoothers.json`,'utf8'));
+      if (member.user.id in smoothed) {
+        member.send("Welcome back!");
+        console.log(`${member.displayName} is rough once more!`)
+        smoothWelcome(member,smoothed);
+      }
     }
 
     //
-    else welcomeWelcome(member);
+    else if (config.features.welcome.message) welcomeWelcome(member);
   }
 }
 
-function smoothWelcome (member, smoothed) {
+async function smoothWelcome (member, smoothed) {
 
   const returnKing = smoothed[member.user.id]
   // add back each role that isn't @everyone
@@ -30,24 +32,23 @@ function smoothWelcome (member, smoothed) {
       console.log(`role ID = ${roleID}`);
       try {
         const role = member.guild.roles.cache.find(role => role.id === roleID);
-        member.roles.add(role)
-        .then(console.log(`\trole ${role.name} added`));
+        await member.roles.add(role)
+        console.log(`\trole ${role.name} added`);
       } catch (error) {console.error(error);}
     }
   }
 
   // set nickname
   if (smoothed[member.user.id].nickname) {
-    member.setNickname(smoothed[member.user.id].nickname);
+    await member.setNickname(smoothed[member.user.id].nickname);
     console.log(`nickname set!`);
   }
 
   // and remove them from the smoothed log
-  delete smoothed[member.user.id];
-  setTimeout( function(){
-    fs.writeFileSync(`./resources/smoothers.json`,JSON.stringify(smoothed));
-    console.log(`welcome back ${member.displayName}!`);
-	},1000);
+  await delete smoothed[member.user.id];
+  await fs.writeFileSync(`./resources/smoothers.json`,JSON.stringify(smoothed));
+  console.log(`welcome back ${member.displayName}!`);
+
 }
 
 

@@ -1,9 +1,11 @@
 // affirm.js
 
 const fs = require('fs');
-const config = require('./../resources/config.json');
+const helpers = require('./../resources/helpers.js');
+const config = helpers.config;
 
 let affirmations = fs.readFileSync('./resources/affirmations.txt','utf8').replace(/\r|\t/g,'').split('\n');
+// text files have an annoying habit of saving one blank line. So we pop it off
 affirmations.pop();
 
 module.exports = {
@@ -35,10 +37,12 @@ module.exports = {
     message.react('❤️')
   },
 
+
 	help(message,args) {
 		message.channel.send(this.description);
 	}
 };
+
 
 
 function sendCakeLyrics (channel,title) {
