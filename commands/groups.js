@@ -6,13 +6,17 @@ let groupRoles = config.commands.groups.roles;
 
 module.exports = {
 	name: 'groups',
-  aliases: ['group','join'],
+  aliases: ['group','join','leave'],
 	description: 'group role management',
 
 	execute(message, args) {
+		const word1 = getCommandName(message);
 		const arg0 = args.shift();
     if (arg0 === "add") this.add(message,args);
-    else if (arg0 === "leave") this.leave(message,args);
+    else if (arg0 === "leave" || word1 === "leave") {
+			if (arg0 !== "leave") args.unshift(arg0);
+			this.leave(message,args);
+		}
     else {
 			if (arg0 !== "join") args.unshift(arg0);
 			this.join(message,args);
@@ -20,7 +24,7 @@ module.exports = {
   },
 
   help (message,args) {
-    message.channel.send("To join a group, use \`!join group\`, e.g., \`!join bookclub\`.")
+    message.channel.send("To join a group, use \`!join group\`, e.g., \`!join bookclub\`.");
   },
 
   async join(message,args) {
@@ -28,12 +32,12 @@ module.exports = {
 		const validRoles = args.filter(arg => arg in groupRoles);
 		// then find and add each role mentioned
     for (role of validRoles) {
-      const addRole = findRole(role);
+      const addRole = findRole(message,role);
       message.member.roles.add(addRole);
     }
 		// also check for @'d roles (why would someone @ a whole group tho??)
 		if (message.mentions && message.mentions.roles) {
-			const mentionedRoles = await message.mentions.roles.filter(role => Object.values(groupRoles).includes(role.id));
+			const mentionedRoles = await message.mentions.roles.filter(role => Object.values(groupRoles).some(elem => elem === role.id));
 			await mentionedRoles.each(role => message.member.roles.add(role));
 		}
     message.react('👍');
@@ -42,7 +46,7 @@ module.exports = {
 
   leave(message,args) {
     for (arg of args) {
-      const remRole = findRole(arg);
+      const remRole = findRole(message,arg);
       message.member.roles.remove(remRole);
     }
     message.react('👍');
